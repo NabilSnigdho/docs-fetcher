@@ -6,10 +6,26 @@ import { join } from "node:path";
 
 const [url, dir] = Bun.argv.slice(2);
 
-if (url === "install" && dir === "skill") {
-  const dest = join(homedir(), ".claude/skills/docs-fetcher/SKILL.md");
-  await Bun.write(dest, Bun.file(join(import.meta.dir, "skill/SKILL.md")));
-  console.log(dest);
+if (url === "install-skill") {
+  // ponytail: delegates to the skills CLI (any agent); installs from the GitHub repo, so push first
+  await Bun.$`bunx skills add NabilSnigdho/docs-fetcher --skill docs-fetcher -g -y`;
+  process.exit(0);
+}
+
+const binDir = join(homedir(), ".local/bin");
+let obscura = Bun.which("obscura") ?? Bun.which("obscura", { PATH: binDir });
+
+if (url === "doctor") {
+  const ok = (good: boolean, msg: string) => console.log(`${good ? "ok  " : "FAIL"} ${msg}`);
+  ok(!!obscura, `obscura: ${obscura ?? "not found (installed on first fetch)"}`);
+  if (obscura) {
+    const r = await Bun.$`${obscura} fetch https://example.com --dump html`.quiet().nothrow();
+    ok(r.exitCode === 0 && r.text().includes("Example Domain"), "obscura can fetch https://example.com");
+  }
+  // ponytail: only checks the Claude and shared-agents dirs, extend if other agents matter
+  const skill = [".claude/skills", ".agents/skills"].map((d) => join(homedir(), d, "docs-fetcher/SKILL.md"));
+  const found = (await Promise.all(skill.map((f) => Bun.file(f).exists()))).some(Boolean);
+  ok(found, "skill installed (fix: docs-fetcher install-skill)");
   process.exit(0);
 }
 
@@ -18,8 +34,6 @@ if (!url || !dir) {
   process.exit(1);
 }
 
-const binDir = join(homedir(), ".local/bin");
-let obscura = Bun.which("obscura") ?? Bun.which("obscura", { PATH: binDir });
 if (!obscura) {
   console.error("obscura not found, installing to", binDir);
   const tar = "obscura-x86_64-linux.tar.gz";

@@ -5,4 +5,4 @@ description: Fetch a documentation web page as clean Markdown with the docs-fetc
 
 Run `docs-fetcher <url> <dir>`. It renders the page, converts it to Markdown, writes `<dir>/<host-and-path-slug>.md`, and prints the file path. Read that file afterwards.
 
-Update this skill with `docs-fetcher install skill`.
+Update this skill with `docs-fetcher install-skill`.
