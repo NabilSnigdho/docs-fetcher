@@ -1,0 +1,22 @@
+{
+  "name": "docs-fetcher",
+  "module": "index.ts",
+  "type": "module",
+  "bin": {
+    "docs-fetcher": "./index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "typecheck": "bun check"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "@brimp/brimp": "^0.1.0",
+    "@page2ai/core": "^0.4.2"
+  }
+}
